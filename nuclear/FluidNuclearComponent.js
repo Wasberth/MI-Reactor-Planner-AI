@@ -45,43 +45,47 @@ class FluidNuclearComponent extends INuclearComponent {
     }
 }
 
-NuclearComponent.register(new FluidNuclearComponent(
-    Fluids.WATER,
-    NuclearConstant.BASE_HEAT_CONDUCTION * 5,
-    1,
-    NuclearConstant.ScatteringType.ULTRA_LIGHT,
-    NuclearConstant.HYDROGEN,
-    Fluids.DEUTERIUM,
-    1,
-    1
-));
-NuclearComponent.register(new FluidNuclearComponent(
-    Fluids.HEAVY_WATER,
-    NuclearConstant.BASE_HEAT_CONDUCTION * 6,
-    1,
-    NuclearConstant.ScatteringType.LIGHT,
-    NuclearConstant.DEUTERIUM,
-    Fluids.TRITIUM,
-    1,
-    1
-));
-NuclearComponent.register(new FluidNuclearComponent(
-    Fluids.HIGH_PRESSURE_WATER,
-    NuclearConstant.BASE_HEAT_CONDUCTION * 5,
-    4,
-    NuclearConstant.ScatteringType.ULTRA_LIGHT,
-    NuclearConstant.HYDROGEN,
-    Fluids.DEUTERIUM,
-    8,
-    0.125
-));
-NuclearComponent.register(new FluidNuclearComponent(
-    Fluids.HIGH_PRESSURE_HEAVY_WATER,
-    NuclearConstant.BASE_HEAT_CONDUCTION * 6,
-    4,
-    NuclearConstant.ScatteringType.LIGHT,
-    NuclearConstant.DEUTERIUM,
-    Fluids.TRITIUM,
-    8,
-    0.125
-));
+const afterImports = () => {
+    global.NuclearComponent.register(new FluidNuclearComponent(
+        Fluids.WATER,
+        NuclearConstant.BASE_HEAT_CONDUCTION * 5,
+        1,
+        NuclearConstant.ScatteringType.ULTRA_LIGHT,
+        NuclearConstant.HYDROGEN,
+        Fluids.DEUTERIUM,
+        1,
+        1
+    ));
+    global.NuclearComponent.register(new FluidNuclearComponent(
+        Fluids.HEAVY_WATER,
+        NuclearConstant.BASE_HEAT_CONDUCTION * 6,
+        1,
+        NuclearConstant.ScatteringType.LIGHT,
+        NuclearConstant.DEUTERIUM,
+        Fluids.TRITIUM,
+        1,
+        1
+    ));
+    global.NuclearComponent.register(new FluidNuclearComponent(
+        Fluids.HIGH_PRESSURE_WATER,
+        NuclearConstant.BASE_HEAT_CONDUCTION * 5,
+        4,
+        NuclearConstant.ScatteringType.ULTRA_LIGHT,
+        NuclearConstant.HYDROGEN,
+        Fluids.DEUTERIUM,
+        8,
+        0.125
+    ));
+    global.NuclearComponent.register(new FluidNuclearComponent(
+        Fluids.HIGH_PRESSURE_HEAVY_WATER,
+        NuclearConstant.BASE_HEAT_CONDUCTION * 6,
+        4,
+        NuclearConstant.ScatteringType.LIGHT,
+        NuclearConstant.DEUTERIUM,
+        Fluids.TRITIUM,
+        8,
+        0.125
+    ));
+}
+
+module.exports = {FluidNuclearComponent, afterImports}

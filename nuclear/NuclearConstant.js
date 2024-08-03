@@ -89,3 +89,6 @@ const [Fuels, FuelData] = (() => {
     })
     return [Object.freeze(keys), data];
 })();
+
+module.exports = {ScatteringType, IsotopeParams, NuclearConstant, 
+    NeutronFate, NeutronInteraction, NeutronType, Items, Fluids, Fuels, FuelData}

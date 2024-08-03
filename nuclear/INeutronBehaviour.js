@@ -55,3 +55,5 @@ class INeutronBehaviour {
     });
 
 }
+
+module.exports = {INeutronBehaviour}

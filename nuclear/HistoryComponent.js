@@ -44,7 +44,6 @@ class IntegerHistoryComponent {
     }
 }
 
-
 const NeutronHistoryComponentType = Object.freeze({
     fastNeutronReceived: 0,
     fastNeutronFlux: 1,
@@ -186,3 +185,8 @@ class NuclearProductionHistoryComponent extends IntegerHistoryComponent {
         this.addValue(historyComponent, amount);
     }
 }
+
+module.exports = {IntegerHistoryComponent, NeutronHistoryComponentType, 
+    NeutronHistoryComponent, NuclearEfficiencyHistoryComponentType,
+    NuclearEfficiencyHistoryComponent, NuclearProductionHistoryComponentType,
+    NuclearProductionHistoryComponent}

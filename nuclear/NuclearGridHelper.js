@@ -4,7 +4,7 @@ class NuclearGridHelper {
     static dY = [0, 1, 0, -1];
     static MAX_SPLIT = 30;
 
-    static simulate(grid, efficiencyHistory) {
+    static simulate(grid, efficiencyHistory, productionHistory) {
 
         const sizeX = grid.sizeX;
         const sizeY = grid.sizeY;
@@ -22,7 +22,7 @@ class NuclearGridHelper {
                 }
 
                 const maybeFuel = tile.getFuel();
-                const neutronNumberPrime = tile.neutronGenerationTick(efficiencyHistory);
+                const neutronNumberPrime = tile.neutronGenerationTick(efficiencyHistory, productionHistory);
                 if (neutronNumberPrime == 0) {
                     continue;
                 }
@@ -187,3 +187,5 @@ class NuclearGridHelper {
         return hasFuel;
     }
 }
+
+module.exports = {NuclearGridHelper}

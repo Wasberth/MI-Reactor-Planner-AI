@@ -7,3 +7,5 @@ const assert = (cond, msg) => {
         throw Error(msg);
     }
 }
+
+module.exports = {randIntFromDouble, assert}

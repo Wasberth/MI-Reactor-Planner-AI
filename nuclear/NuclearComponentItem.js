@@ -25,16 +25,20 @@ class NuclearComponentItem extends INuclearComponent {
     }
 }
 
-NuclearComponent.register(new NuclearComponentItem(
-    Items.SMALL_HEAT_EXCHANGER,
-    2500,
-    15 * NuclearConstant.BASE_HEAT_CONDUCTION,
-    INeutronBehaviour.NO_INTERACTION
-));
+const afterImports = () => {
+    global.NuclearComponent.register(new NuclearComponentItem(
+        Items.SMALL_HEAT_EXCHANGER,
+        2500,
+        15 * NuclearConstant.BASE_HEAT_CONDUCTION,
+        INeutronBehaviour.NO_INTERACTION
+    ));
+    
+    global.NuclearComponent.register(new NuclearComponentItem(
+        Items.LARGE_HEAT_EXCHANGER,
+        1800,
+        30 * NuclearConstant.BASE_HEAT_CONDUCTION,
+        INeutronBehaviour.NO_INTERACTION
+    ));
+}
 
-NuclearComponent.register(new NuclearComponentItem(
-    Items.LARGE_HEAT_EXCHANGER,
-    1800,
-    30 * NuclearConstant.BASE_HEAT_CONDUCTION,
-    INeutronBehaviour.NO_INTERACTION
-));
+module.exports = {NuclearComponentItem, afterImports}

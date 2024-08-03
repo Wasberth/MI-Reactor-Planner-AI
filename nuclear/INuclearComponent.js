@@ -24,3 +24,5 @@ class NuclearComponent {
         return NuclearComponent.registry[key];
     }
 }
+
+module.exports = {INuclearComponent, NuclearComponent}

@@ -32,7 +32,7 @@ Simulator.update = function() {
                 hatch.tick();
             }
         })
-        NuclearGridHelper.simulate(this.nuclearGrid, this.efficiencyHistory);
+        NuclearGridHelper.simulate(this.nuclearGrid, this.efficiencyHistory, this.productionHistory);
         this.efficiencyHistory.tick();
         this.productionHistory.tick();
     }
@@ -57,16 +57,27 @@ const Overlay = Object.freeze({
     EU_GENERATION: 5,
 });
 
+/**
+ * @param {number} i - Reactor size index (0-3)
+ * @param {Array<number>} tiles - Array (n*n) of Tile values
+ * @returns {Object}
+ */
 TileMap = (i, tiles = null) => {
     let length = 5 + 2 * i
 
     let map = {
         size: length,
-        tsize: 64,
+        tsize: 64, //NO IMPORTA
         tiles: tiles || new Array(length * length),
         getTile: function (col, row) {
             return this.tiles[row * map.size + col];
         },
+        /**
+         * Cambio de objeto Tile en la posición (col, row)
+         * Se toma en cuenta si la Tile es un Hatch, en cuyo caso no se puede cambiar
+         * 
+         * Para UI si se agrega 
+         */
         setTile: function (col, row, tile) {
             const oldTile = this.tiles[row * map.size + col];
             if (tile == null || oldTile == null) {

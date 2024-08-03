@@ -60,8 +60,8 @@ class NuclearFuel extends NuclearAbsorbable {
         return factor;
     }
 
-    simulateDesintegration(neutronsReceived, temperature, efficiencyHistory) {
-        const absorption = this.simulateAbsorption(neutronsReceived);
+    simulateDesintegration(neutronsReceived, temperature, efficiencyHistory, productionHistory) {
+        const absorption = this.simulateAbsorption(neutronsReceived, productionHistory);
         const fuelEuConsumed = absorption * this.totalEUbyDesintegration;
         efficiencyHistory.registerEuFuelConsumption(fuelEuConsumed);
 
@@ -69,23 +69,27 @@ class NuclearFuel extends NuclearAbsorbable {
     }
 }
 
-FuelData.forEach(type => {
-    const params = FuelIsotopes[type.isotope];
-    const fuelParams = new NuclearFuelParams(
-        NuclearConstant.DESINTEGRATION_BY_ROD * type.size,
-        params.maxTemp,
-        params.tempLimitLow,
-        params.tempLimitHigh,
-        params.neutronsMultiplication,
-        params.directEnergyFactor,
-        type.size
-    );
-    const neutronBehaviour = INeutronBehaviour.ofParams(NuclearConstant.ScatteringType.HEAVY, params, type.size)
+const afterImports = () => {
+    global.FuelData.forEach(type => {
+        const params = FuelIsotopes[type.isotope];
+        const fuelParams = new NuclearFuelParams(
+            NuclearConstant.DESINTEGRATION_BY_ROD * type.size,
+            params.maxTemp,
+            params.tempLimitLow,
+            params.tempLimitHigh,
+            params.neutronsMultiplication,
+            params.directEnergyFactor,
+            type.size
+        );
+        const neutronBehaviour = INeutronBehaviour.ofParams(NuclearConstant.ScatteringType.HEAVY, params, type.size)
 
-    NuclearComponent.register(NuclearFuel.of(
-        type.key,
-        fuelParams,
-        neutronBehaviour,
-        type.depleted
-    ));
-});
+        global.NuclearComponent.register(NuclearFuel.of(
+            type.key,
+            fuelParams,
+            neutronBehaviour,
+            type.depleted
+        ));
+    });
+}
+
+module.exports = {clampTemp, NuclearFuelParams, NuclearFuel, afterImports}

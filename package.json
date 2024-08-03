@@ -1,0 +1,21 @@
+{
+  "name": "mi-reactor-planner-main",
+  "version": "1.0.0",
+  "description": "Tries to find the best configuration for the nuclear reactor using AI",
+  "main": "start.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "AI",
+    "Modern",
+    "Industrialization",
+    "Bioinspired",
+    "Algorithms"
+  ],
+  "author": "Willy",
+  "license": "MIT",
+  "dependencies": {
+    "minimist": "^1.2.8"
+  }
+}

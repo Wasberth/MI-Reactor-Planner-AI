@@ -49,3 +49,5 @@ const FuelIsotopes = Object.freeze({
     LE_MOX: IsotopeFuelParams.mix(Isotopes.URANIUM_238, Isotopes.PLUTONIUM, 1.0 / 9),
     HE_MOX: IsotopeFuelParams.mix(Isotopes.URANIUM_238, Isotopes.PLUTONIUM, 1.0 / 3),
 });
+
+module.exports = {IsotopeFuelParams, Isotopes, FuelIsotopes}

@@ -16,3 +16,5 @@ class NuclearGrid {
 
     registerNeutronCreation(neutronNumber, type) {}
 }
+
+module.exports = {NuclearGrid}

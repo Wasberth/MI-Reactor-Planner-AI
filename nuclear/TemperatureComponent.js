@@ -109,3 +109,5 @@ class SteamHeaterComponent extends TemperatureComponent {
         return 0;
     }
 }
+
+module.exports = {TemperatureComponent, SteamHeaterComponent}

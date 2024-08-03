@@ -14,7 +14,7 @@ class INuclearTile { // extends INuclearTileData
     addNeutronsToFlux(neutronNumber, type) {
         throw Error("Not implemented!");
     }
-    neutronGenerationTick(efficiencyHistory) {
+    neutronGenerationTick(efficiencyHistory, productionHistory) {
         throw Error("Not implemented!");
     }
     nuclearTick(efficiencyHistory) {
@@ -100,7 +100,7 @@ class NuclearHatch extends INuclearTile {
         this.neutronHistory.addValue(NeutronHistoryComponentType.euGeneration, Math.floor(eu));
     }
 
-    neutronGenerationTick(efficiencyHistory) {
+    neutronGenerationTick(efficiencyHistory, productionHistory) {
         let meanNeutron = this.getMeanNeutronAbsorption(NeutronType.BOTH);
         let neutronsProduced = 0;
 
@@ -121,9 +121,9 @@ class NuclearHatch extends INuclearTile {
 
             if (abs instanceof NuclearFuel) {
                 const fuel = abs;
-                neutronsProduced = fuel.simulateDesintegration(meanNeutron, this.nuclearReactorComponent.getTemperature(), efficiencyHistory);
+                neutronsProduced = fuel.simulateDesintegration(meanNeutron, this.nuclearReactorComponent.getTemperature(), efficiencyHistory, productionHistory);
             } else {
-                abs.simulateAbsorption(meanNeutron);
+                abs.simulateAbsorption(meanNeutron, productionHistory);
             }
 
             /*
@@ -213,36 +213,6 @@ class NuclearHatch extends INuclearTile {
             this.neutronHistory.addValue(NeutronHistoryComponentType.thermalNeutronFlux, neutronNumber);
         }
     }
-    /*
-
-    public static void registerItemApi(BlockEntityType<?> bet) {
-        MICapabilities.onEvent(event -> {
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, bet,
-                    (be, direction) -> direction == UP ? ((NuclearHatch) be).getInventory().itemStorage.itemHandler : null);
-        });
-    }
-
-    public static void registerFluidApi(BlockEntityType<?> bet) {
-        MICapabilities.onEvent(event -> {
-            event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, bet,
-                    (be, direction) -> direction == UP ? ((NuclearHatch) be).getInventory().fluidStorage.fluidHandler : null);
-        });
-    }
-
-    @Override
-    public List<Component> getTooltips() {
-        if (isFluid) {
-            return List.of(new MITooltips.Line(MIText.MaxEuProductionSteam).arg(
-                    NuclearConstant.MAX_HATCH_EU_PRODUCTION,
-                    MITooltips.EU_PER_TICK_PARSER).arg(MIFluids.STEAM).build(),
-                    new MITooltips.Line(MIText.AcceptLowAndHighPressure).arg(Fluids.WATER).arg(MIFluids.HEAVY_WATER)
-                            .arg(MIFluids.HIGH_PRESSURE_WATER).arg(MIFluids.HIGH_PRESSURE_HEAVY_WATER).build());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
 }
-*/
 
-}
+module.exports = {INuclearTile, NuclearHatch}
