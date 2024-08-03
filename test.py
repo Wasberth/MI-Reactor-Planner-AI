@@ -4,9 +4,12 @@ import subprocess
 # Function to run the Node.js script
 def run_node_script():
     result = subprocess.run(
-        ['node -v'],
+        ['node', 'start.js', '--value', '0', '--conts', '0,0,0,0,5,0,0,0,0'],
         shell=True,
-        text=True  # Return the output as a string
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
     )
     
     if result.returncode == 0:
