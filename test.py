@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import json
 
 # Function to run the Node.js script
 def run_node_script():
@@ -25,7 +26,6 @@ if output:
     print("Output from Node.js script:")
     print(output)
     # Parse the output to extract values if needed
-    for line in output.splitlines():
-        if 'The answer is:' in line:
-            value = int(line.split(':')[-1].strip())
-            print(f"Extracted value: {value}")
+    json_output = json.loads(output)
+    print("Parsed output:")
+    print(json_output)

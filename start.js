@@ -272,25 +272,26 @@ const carbonPlateConsumption = Simulator.productionHistory.getAverage(NuclearPro
 const controlRodConsumption = Simulator.productionHistory.getAverage(NuclearProductionHistoryComponentType.controlRodConsumption);
 
 
+
 const addFluid = (prefix, value)  => {
     if (value > 0) {
         console.log(`${prefix}${format(value, ' mb/t')}`);
     }
 };
 
-console.log('INPUT');
-addFluid('  Water                ', waterConsumption);
-addFluid('  Heavy Water          ', heavyWaterConsumption);
-addFluid('  HP Water             ', highPressureWaterConsumption);
-addFluid('  HP Heavy Water       ', highPressureHeavyWaterConsumption);
+// console.log('INPUT');
+// addFluid('  Water                ', waterConsumption);
+// addFluid('  Heavy Water          ', heavyWaterConsumption);
+// addFluid('  HP Water             ', highPressureWaterConsumption);
+// addFluid('  HP Heavy Water       ', highPressureHeavyWaterConsumption);
 
-console.log('OUTPUT');
-addFluid('  Steam                ', steamProduction);
-addFluid('  Heavy Water Steam    ', heavyWaterSteamProduction);
-addFluid('  HP Water Steam       ', highPressureSteamProduction);
-addFluid('  HP Heavy Water Steam ', highPressureHeavyWaterSteamProduction);
-addFluid('  Deuterium            ', deuteriumProduction);
-addFluid('  Tritium              ', tritiumProduction);
+// console.log('OUTPUT');
+// addFluid('  Steam                ', steamProduction);
+// addFluid('  Heavy Water Steam    ', heavyWaterSteamProduction);
+// addFluid('  HP Water Steam       ', highPressureSteamProduction);
+// addFluid('  HP Heavy Water Steam ', highPressureHeavyWaterSteamProduction);
+// addFluid('  Deuterium            ', deuteriumProduction);
+// addFluid('  Tritium              ', tritiumProduction);
 
 const addRod = (prefix, value)  => {
     if (value !== 0) {
@@ -320,18 +321,47 @@ const isotopeNet = (fromUranium, fromLeMox, fromLeUranium, fromHeMox, fromHeUran
         ) / 9;
 }
 
-console.log('ITEM DEPLETION');
-addRod('  Uranium Rod            ', uraniumRodConsumption);
-addRod('  LE Mox Rod             ', leMoxRodConsumption);
-addRod('  LE Uranium Rod         ', leUraniumRodConsumption);
-addRod('  HE Mox Rod             ', heMoxRodConsumption);
-addRod('  HE Uranium Rod         ', heUraniumRodConsumption);
-addRod('  Control Rod            ', controlRodConsumption);
-addRod('  Invar Plate            ', invarPlateConsumption);
-addRod('  Carbon Plate           ', carbonPlateConsumption);
-console.log('ISOTOPE NET');
-addRod('  Uranium 235            ', isotopeNet(1, 0, -3, 0, -9));
-addRod('  Uranium 238            ', isotopeNet(53, -24, -24, -18, -18));
-addRod('  Plutonium              ', isotopeNet(27, 21, 24, 9, 18));
+// console.log('ITEM DEPLETION');
+// addRod('  Uranium Rod            ', uraniumRodConsumption);
+// addRod('  LE Mox Rod             ', leMoxRodConsumption);
+// addRod('  LE Uranium Rod         ', leUraniumRodConsumption);
+// addRod('  HE Mox Rod             ', heMoxRodConsumption);
+// addRod('  HE Uranium Rod         ', heUraniumRodConsumption);
+// addRod('  Control Rod            ', controlRodConsumption);
+// addRod('  Invar Plate            ', invarPlateConsumption);
+// addRod('  Carbon Plate           ', carbonPlateConsumption);
+// console.log('ISOTOPE NET');
+// addRod('  Uranium 235            ', isotopeNet(1, 0, -3, 0, -9));
+// addRod('  Uranium 238            ', isotopeNet(53, -24, -24, -18, -18));
+// addRod('  Plutonium              ', isotopeNet(27, 21, 24, 9, 18));
 
-console.log(map.toString())
+
+let finalStatistics = {
+    waterConsumption,
+    heavyWaterConsumption,
+    highPressureWaterConsumption,
+    highPressureHeavyWaterConsumption,
+    steamProduction,
+    heavyWaterSteamProduction,
+    highPressureSteamProduction,
+    highPressureHeavyWaterSteamProduction,
+    deuteriumProduction,
+    tritiumProduction,
+    uraniumRodConsumption,
+    leMoxRodConsumption,
+    leUraniumRodConsumption,
+    heMoxRodConsumption,
+    heUraniumRodConsumption,
+    invarPlateConsumption,
+    carbonPlateConsumption,
+    controlRodConsumption,
+    isotopeNet: {
+        uranium235: isotopeNet(1, 0, -3, 0, -9),
+        uranium238: isotopeNet(53, -24, -24, -18, -18),
+        plutonium: isotopeNet(27, 21, 24, 9, 18),
+    },
+}
+
+console.log(JSON.stringify(finalStatistics));
+
+//console.log(map.toString())
