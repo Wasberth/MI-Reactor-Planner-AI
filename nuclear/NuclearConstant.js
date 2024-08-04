@@ -75,6 +75,11 @@ const Fluids = Object.freeze({
     TRITIUM: Symbol('TRITIUM'),
 });
 
+const Blocks = Object.freeze({
+    CASING: Symbol('CASING'),
+    HATCH: Symbol('HATCH'),
+});
+
 const [Fuels, FuelData] = (() => {
     const keys = {};
     const data = [];
@@ -90,5 +95,18 @@ const [Fuels, FuelData] = (() => {
     return [Object.freeze(keys), data];
 })();
 
-module.exports = {ScatteringType, IsotopeParams, NuclearConstant, 
-    NeutronFate, NeutronInteraction, NeutronType, Items, Fluids, Fuels, FuelData}
+class Material {
+    constructor(type) {
+        this.type = type;
+        this.isFluid = Object.values(Fluids).includes(type);
+        this.component = NuclearComponent.get(type);
+    }
+};
+
+const MATERIALS = Object.values(Fluids).slice(0,4).concat(Object.values(Fuels), Object.values(Items))
+    .map((type) => new Material(type));
+
+module.exports = {ScatteringType, IsotopeParams, NuclearConstant, Blocks,
+    NeutronFate, NeutronInteraction, NeutronType, Items, Fluids, Fuels, FuelData,
+    Material, MATERIALS
+}

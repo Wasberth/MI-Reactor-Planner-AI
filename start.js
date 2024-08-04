@@ -46,55 +46,21 @@ let afterImportsFunctions = []
 for (const file of fileList) {
     try {
         const nuclearModule = require(`./nuclear/${file}`)
-        //console.log(`Importing ${file}`)
         for (const imported of Object.keys(nuclearModule)) {
             if (imported === "afterImports") {
                 afterImportsFunctions.push(nuclearModule[imported])
                 continue
             }
 
-            //console.log(`\t${imported}`)
             global[imported] = nuclearModule[imported]
         }
-    } catch (error) {
-        //console.log(error);
-        
+    } catch (error) {        
         fileList.push(file)
-        //console.log(`Dependencies missing for ${file}`)
     }
 }
 
 afterImportsFunctions.forEach(fn => fn());
 
-function Material (type) {
-    this.type = type;
-    this.isFluid = Object.values(Fluids).includes(type);
-    this.component = NuclearComponent.get(type);
-};
-
-const Blocks = Object.freeze({
-    CASING: Symbol('CASING'),
-    HATCH: Symbol('HATCH'),
-});
-
-const format = (x, suffix='') => {
-    const lookup = [
-      [ 1, ""],
-      [ 1e3, "k"],
-      [ 1e6, "M"],
-      [ 1e9, "G"],
-      [ 1e12, "T"],
-      [ 1e15, "P"],
-      [ 1e18, "E"],
-    ];
-    const [value, symbol] = lookup.findLast(([value]) => x >= value) || lookup[0];
-    const v = x / value;
-    const digits = 3 - Math.floor(Math.log10(Math.max(1, v)));
-    return `${(v).toFixed(digits)}${symbol}${suffix}`;
-};
-
-const MATERIALS = Object.values(Fluids).slice(0,4).concat(Object.values(Fuels), Object.values(Items))
-    .map((type) => new Material(type));
 
 class Map {
     constructor(value, size, items) {
@@ -142,52 +108,6 @@ class Map {
 
         this.tiles[row * this.size + col] = newTile;
         Simulator.init(this);
-    }
-
-    /**
-     * Devuelve una Tile aleatoria que no sea null
-     * 
-     * @returns {Array} [col, row]
-     */
-    chooseRandomTile () {
-        let randomCol, randomRow;
-        do {
-            randomCol = Math.floor(Math.random() * this.size);
-            randomRow = Math.floor(Math.random() * this.size);
-        } while (this.getTile(randomCol, randomRow) == null);
-        return [randomCol, randomRow];
-    }
-
-    /*
-     * Cambia dos Tiles adyacentes aleatoriamente
-    */
-    randomizeContents() {
-        let [randomCol, randomRow] = this.chooseRandomTile();
-        let randomMaterial = Math.floor(Math.random() * MATERIALS.length);
-
-        this.setTile(randomCol, randomRow, randomMaterial);
-    }
-
-    /**
-     * Intercambia dos Tiles aleatorias
-     */
-    swapTiles() {
-        let [col1, row1] = this.chooseRandomTile()
-        let [col2, row2] = this.chooseRandomTile()
-
-        const tile1 = this.getTile(col1, row1);
-        const tile2 = this.getTile(col2, row2);
-
-        this.setTile(col1, row1, tile2);
-        this.setTile(col2, row2, tile1);
-    }
-
-    mutate(){
-        if (Math.random() < 0.5) {
-            this.randomizeContents()
-        } else {
-            this.swapTiles()
-        }
     }
 }
 
@@ -271,46 +191,6 @@ const invarPlateConsumption = Simulator.productionHistory.getAverage(NuclearProd
 const carbonPlateConsumption = Simulator.productionHistory.getAverage(NuclearProductionHistoryComponentType.carbonPlateConsumption);
 const controlRodConsumption = Simulator.productionHistory.getAverage(NuclearProductionHistoryComponentType.controlRodConsumption);
 
-
-
-const addFluid = (prefix, value)  => {
-    if (value > 0) {
-        console.log(`${prefix}${format(value, ' mb/t')}`);
-    }
-};
-
-// console.log('INPUT');
-// addFluid('  Water                ', waterConsumption);
-// addFluid('  Heavy Water          ', heavyWaterConsumption);
-// addFluid('  HP Water             ', highPressureWaterConsumption);
-// addFluid('  HP Heavy Water       ', highPressureHeavyWaterConsumption);
-
-// console.log('OUTPUT');
-// addFluid('  Steam                ', steamProduction);
-// addFluid('  Heavy Water Steam    ', heavyWaterSteamProduction);
-// addFluid('  HP Water Steam       ', highPressureSteamProduction);
-// addFluid('  HP Heavy Water Steam ', highPressureHeavyWaterSteamProduction);
-// addFluid('  Deuterium            ', deuteriumProduction);
-// addFluid('  Tritium              ', tritiumProduction);
-
-const addRod = (prefix, value)  => {
-    if (value !== 0) {
-        let suffix = 't';
-        [
-            [20, 's'],
-            [60, 'min'],
-            [60, 'h'],
-            [24, 'day'],
-        ].forEach(([mul, suf]) => {
-            if (Math.abs(value) < 1) {
-                value *= mul;
-                suffix = suf;
-            }
-        });
-        console.log(`${prefix}${value<0?'':' '}${value.toFixed(3)} / ${suffix}`);
-    }
-};
-
 const isotopeNet = (fromUranium, fromLeMox, fromLeUranium, fromHeMox, fromHeUranium) => {
     return (
         uraniumRodConsumption * fromUranium +
@@ -321,40 +201,35 @@ const isotopeNet = (fromUranium, fromLeMox, fromLeUranium, fromHeMox, fromHeUran
         ) / 9;
 }
 
-// console.log('ITEM DEPLETION');
-// addRod('  Uranium Rod            ', uraniumRodConsumption);
-// addRod('  LE Mox Rod             ', leMoxRodConsumption);
-// addRod('  LE Uranium Rod         ', leUraniumRodConsumption);
-// addRod('  HE Mox Rod             ', heMoxRodConsumption);
-// addRod('  HE Uranium Rod         ', heUraniumRodConsumption);
-// addRod('  Control Rod            ', controlRodConsumption);
-// addRod('  Invar Plate            ', invarPlateConsumption);
-// addRod('  Carbon Plate           ', carbonPlateConsumption);
-// console.log('ISOTOPE NET');
-// addRod('  Uranium 235            ', isotopeNet(1, 0, -3, 0, -9));
-// addRod('  Uranium 238            ', isotopeNet(53, -24, -24, -18, -18));
-// addRod('  Plutonium              ', isotopeNet(27, 21, 24, 9, 18));
-
-
 let finalStatistics = {
-    waterConsumption,
-    heavyWaterConsumption,
-    highPressureWaterConsumption,
-    highPressureHeavyWaterConsumption,
-    steamProduction,
-    heavyWaterSteamProduction,
-    highPressureSteamProduction,
-    highPressureHeavyWaterSteamProduction,
-    deuteriumProduction,
-    tritiumProduction,
-    uraniumRodConsumption,
-    leMoxRodConsumption,
-    leUraniumRodConsumption,
-    heMoxRodConsumption,
-    heUraniumRodConsumption,
-    invarPlateConsumption,
-    carbonPlateConsumption,
-    controlRodConsumption,
+    waterConsumption: {
+        water: waterConsumption,
+        heavyWater: heavyWaterConsumption,
+        HPWater: highPressureWaterConsumption,
+        HPHeavyWater: highPressureHeavyWaterConsumption
+    },
+    steamProduction: {
+        steam: steamProduction,
+        heavyWaterSteam: heavyWaterSteamProduction,
+        HPSteam: highPressureSteamProduction,
+        HPHeavyWaterSteam: highPressureHeavyWaterSteamProduction
+    },
+    nuclearLiquids: {
+        deuterium: deuteriumProduction,
+        tritium: tritiumProduction
+    },
+    fuelRodConsumption: {
+        uranium: uraniumRodConsumption,
+        leMox: leMoxRodConsumption,
+        leUranium: leUraniumRodConsumption,
+        heMox: heMoxRodConsumption,
+        heUranium: heUraniumRodConsumption,
+    },
+    itemsConsumption: {
+        invarPlate: invarPlateConsumption,
+        carbonPlate: carbonPlateConsumption,
+        controlRod: controlRodConsumption,
+    },
     isotopeNet: {
         uranium235: isotopeNet(1, 0, -3, 0, -9),
         uranium238: isotopeNet(53, -24, -24, -18, -18),
@@ -363,5 +238,3 @@ let finalStatistics = {
 }
 
 console.log(JSON.stringify(finalStatistics));
-
-//console.log(map.toString())
