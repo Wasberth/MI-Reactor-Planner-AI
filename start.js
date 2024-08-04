@@ -235,6 +235,7 @@ let finalStatistics = {
         uranium238: isotopeNet(53, -24, -24, -18, -18),
         plutonium: isotopeNet(27, 21, 24, 9, 18),
     },
+    layout : map.toString()
 }
 
 console.log(JSON.stringify(finalStatistics));
