@@ -4,7 +4,7 @@ from typing import NamedTuple
 import random
 import numpy as np
 
-from Chromosome import Chromosome, ChromosomeHandler, Parents
+from geneticAlgorithm.Chromosome import Chromosome, ChromosomeHandler, Parents
 
 type Evaluation = float
 class ParentIndexes(NamedTuple):
@@ -23,12 +23,20 @@ class Genetic:
 		self.handler = chromosomeHandler
 
 	def run(self, select_parents: Callable[[list[Evaluation], random.Random], list[ParentIndexes]],
-			mate_parents: Callable[[Parents, random.Random], Chromosome], max_iters: int, minimizing: bool = True,
-			seed: int | float | str | bytes | bytearray | None = None):
+			mate_parents: Callable[[Parents, random.Random], Chromosome], iters: int, minimizing: bool = True,
+			print_every: int = -1, seed: int | float | str | bytes | bytearray | None = None):
+
+		print("Running Genetic algorithm", "minimizing" if minimizing else "maximizing", f"for {iters} iterations")
 
 		r = random.Random(seed)
 		population: list[Chromosome] = [self.handler.random_val(r) for _ in range(self.size_pop)]
 		evaluation: list[Evaluation] = [self.f(p) for p in population]
+
+		best_index = np.argsort(evaluation)
+		if not minimizing:
+			best_index = best_index[::-1]
+		population = [population[i] for i in best_index]
+		evaluation = [evaluation[i] for i in best_index]
 
 		num_iters = 0
 
@@ -38,7 +46,11 @@ class Genetic:
 		max_hist = [max_found]
 		avg_hist: list[Evaluation] = [np.average(evaluation)]
 
-		while num_iters < max_iters:
+		while num_iters < iters:
+			if print_every != -1 and (num_iters % print_every) == 0:
+				print(f"Best value found in iteration {num_iters}:", min_found if minimizing else max_found)
+				print(f"Current best 15 values:", evaluation[0:min(15, len(evaluation))])
+
 			parents = select_parents(evaluation, r)
 			new_gen = [mate_parents((population[parent1], population[parent2]), r) for parent1, parent2 in parents if r.random() < self.cross_percent]
 
@@ -56,9 +68,13 @@ class Genetic:
 			evaluation = [evaluation[i] for i in best_index][0:self.size_pop]
 
 			num_iters += 1
-			min_found = min(min_found, evaluation[0])
+			current_min = min(evaluation)
+			current_max = max(evaluation)
+
+			min_found = min(min_found, current_min)
+			max_found = min(max_found, current_max)
 			min_hist.append(min_found)
-			max_hist.append(max(evaluation))
+			max_hist.append(max_found)
 			avg_hist.append(np.average(evaluation))
 
 		best_found = min_found if minimizing else max_found
@@ -80,7 +96,7 @@ def tournament_selection(evals: list[Evaluation], r: random.Random) -> list[Pare
 		for i in range(num_agents)
 		]
 
-	winners = [[winners[i], winners[i+1]] for i in range(0, num_agents, 2)] 
+	winners = [[winners[i], winners[i+1]] for i in range(0, num_agents - (num_agents%2), 2)] 
 	
 	return winners
 
@@ -93,21 +109,22 @@ if __name__ == "__main__":
 	cross_percent = 0.9
 	mutation_percent = 0.1
 	iters = 1000
+	print_every = 100
 
-	def squareSum(vector):
+	def square_sum(vector):
 		sum = 0
 		for x in vector:
 			sum += x*x
 		return sum
 
-	test_function = squareSum
+	test_function = square_sum
 
 	chromo = ChromosomeHandler(15, 0, 100)
 	gen = Genetic(test_function, size_pop, cross_percent, mutation_percent, chromo)
 
 	start = time.time()
 	best_value, best_combination, min_hist, max_hist, avg_hist = \
-		gen.run(tournament_selection, chromo.mate, iters, True, start)
+		gen.run(tournament_selection, chromo.mate, iters, True, print_every, start)
 	end = time.time()	
 
 	print("Se tardó ", end-start)

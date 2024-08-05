@@ -123,7 +123,7 @@ Map.prototype.toString = function () {
             if (tile == null || !MATERIALS[tile]) {
                 continue;
             }
-            mapString += MATERIALS[tile].type.toString();
+            mapString += MATERIALS[tile].type.toString().match(/^Symbol\((.*)\)$/)[1] + " ";
         }
         mapString += '\n';
     }
@@ -135,9 +135,9 @@ let map = new Map(value, size, contents)
 
 const Simulator = {};
 global.Simulator = Simulator
-Simulator.speed = 1200 * 5;
+Simulator.speed = 1200 * 10;
 Simulator.steamOutput = true;
-Simulator.historyLength = 1200 * 5;
+Simulator.historyLength = 1200 * 7;
 
 Simulator.init = function(map) {
     const hatchesGrid = new Array(map.size * map.size).fill(null);
@@ -193,6 +193,9 @@ const invarPlateConsumption = Simulator.productionHistory.getAverage(NuclearProd
 const carbonPlateConsumption = Simulator.productionHistory.getAverage(NuclearProductionHistoryComponentType.carbonPlateConsumption);
 const controlRodConsumption = Simulator.productionHistory.getAverage(NuclearProductionHistoryComponentType.controlRodConsumption);
 
+const euProduction = Simulator.efficiencyHistory.getAverage(NuclearEfficiencyHistoryComponentType.euProduction);
+const euFuelConsumption = Simulator.efficiencyHistory.getAverage(NuclearEfficiencyHistoryComponentType.euFuelConsumption);
+
 const isotopeNet = (fromUranium, fromLeMox, fromLeUranium, fromHeMox, fromHeUranium) => {
     return (
         uraniumRodConsumption * fromUranium +
@@ -201,6 +204,24 @@ const isotopeNet = (fromUranium, fromLeMox, fromLeUranium, fromHeMox, fromHeUran
         heMoxRodConsumption * fromHeMox +
         heUraniumRodConsumption * fromHeUranium
         ) / 9;
+}
+
+itemsBurned = 0;
+
+for (let c = 0; c < size; c++) {
+    for (let r = 0; r < size; r++) {
+        let tile = map.getTile(c, r);
+
+        if (tile == null) {
+            continue;
+        }
+
+        const tileData = Simulator.nuclearGrid.getNuclearTile(c, r);        
+
+        if (tileData.component && tileData.getTemperature() > tileData.component.getMaxTemperature()) {
+            itemsBurned++
+        };
+    }
 }
 
 let finalStatistics = {
@@ -237,7 +258,13 @@ let finalStatistics = {
         uranium238: isotopeNet(53, -24, -24, -18, -18),
         plutonium: isotopeNet(27, 21, 24, 9, 18),
     },
-    layout : map.toString()
+    efficiencyData: {
+        euProduced: euProduction,
+        euFuelConsumed: euFuelConsumption,
+        efficiency: 100 * euProduction / euFuelConsumption,
+        itemsBurned
+    },
+    layout: map.toString()
 }
 
 console.log(JSON.stringify(finalStatistics));
