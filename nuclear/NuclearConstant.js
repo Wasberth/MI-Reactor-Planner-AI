@@ -103,10 +103,7 @@ class Material {
     }
 };
 
-const MATERIALS = Object.values(Fluids).slice(0,4).concat(Object.values(Fuels), Object.values(Items))
-    .map((type) => new Material(type));
-
 module.exports = {ScatteringType, IsotopeParams, NuclearConstant, Blocks,
     NeutronFate, NeutronInteraction, NeutronType, Items, Fluids, Fuels, FuelData,
-    Material, MATERIALS
+    Material
 }

@@ -61,6 +61,8 @@ for (const file of fileList) {
 
 afterImportsFunctions.forEach(fn => fn());
 
+const MATERIALS = Object.values(Fluids).slice(0,4).concat(Object.values(Fuels), Object.values(Items))
+    .map((type) => new Material(type));
 
 class Map {
     constructor(value, size, items) {
@@ -133,9 +135,9 @@ let map = new Map(value, size, contents)
 
 const Simulator = {};
 global.Simulator = Simulator
-Simulator.speed = 1200;
+Simulator.speed = 1200 * 5;
 Simulator.steamOutput = true;
-Simulator.historyLength = 1200;
+Simulator.historyLength = 1200 * 5;
 
 Simulator.init = function(map) {
     const hatchesGrid = new Array(map.size * map.size).fill(null);
