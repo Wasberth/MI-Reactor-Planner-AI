@@ -1,1 +1,4 @@
 node_modules/
+resultados/
+__pycache__/
+test.js

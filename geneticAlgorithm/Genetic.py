@@ -24,14 +24,18 @@ class Genetic:
 
 	def run(self, select_parents: Callable[[list[Evaluation], random.Random], list[ParentIndexes]],
 			mate_parents: Callable[[Parents, random.Random], Chromosome], iters: int, minimizing: bool = True,
-			print_every: int = -1, seed: int | float | str | bytes | bytearray | None = None):
+			print_every: int = -1, seed: int | float | str | bytes | bytearray | None = None, superparent: Chromosome | None = None, save_generation: Callable[[list[Chromosome], list[Evaluation], int], None] = lambda p, e, i: None) :
 
 		print("Running Genetic algorithm", "minimizing" if minimizing else "maximizing", f"for {iters} iterations")
 
 		r = random.Random(seed)
-		population: list[Chromosome] = [self.handler.random_val(r) for _ in range(self.size_pop)]
-		evaluation: list[Evaluation] = [self.f(p) for p in population]
+		if superparent is not None:
+			population: list[Chromosome] = [self.handler.mutate(superparent.copy(), self.mutation_percent, r) for _ in range(self.size_pop)]
+		else:
+			population: list[Chromosome] = [self.handler.random_val(r) for _ in range(self.size_pop)]
 
+		evaluation: list[Evaluation] = [self.f(p) for p in population]
+		
 		best_index = np.argsort(evaluation)
 		if not minimizing:
 			best_index = best_index[::-1]
@@ -47,40 +51,48 @@ class Genetic:
 		avg_hist: list[Evaluation] = [np.average(evaluation)]
 
 		while num_iters < iters:
-			if print_every != -1 and (num_iters % print_every) == 0:
-				print(f"Best value found in iteration {num_iters}:", min_found if minimizing else max_found)
-				print(f"Current best 15 values:", evaluation[0:min(15, len(evaluation))])
+			try:
 
-			parents = select_parents(evaluation, r)
-			new_gen = [mate_parents((population[parent1], population[parent2]), r) for parent1, parent2 in parents if r.random() < self.cross_percent]
+				if print_every != -1 and (num_iters % print_every) == 0:
+					print(f"Best value found in iteration {num_iters}:", min_found if minimizing else max_found)
+					print(f"Current best 15 values:", ["{:.2f}".format(value) for value in evaluation[0:min(15, len(evaluation))]])
+					print(f"Valid values found:", len([e for e in evaluation if e != 0]))
+					save_generation(population, evaluation, num_iters)
 
-			for p in new_gen:
-				if r.random() < self.mutation_percent:
-					p = self.handler.mutate(p, self.mutation_percent, r)
+				parents = select_parents(evaluation, r)
+				new_gen = [mate_parents((population[parent1], population[parent2]), r) for parent1, parent2 in parents if r.random() < self.cross_percent]
 
-				population.append(p)
-				evaluation.append(self.f(p))
+				for p in new_gen:
+					if r.random() < self.mutation_percent:
+						p = self.handler.mutate(p, self.mutation_percent, r)
 
-			best_index = np.argsort(evaluation)
-			if not minimizing:
-				best_index = best_index[::-1]
-			population = [population[i] for i in best_index][0:self.size_pop]
-			evaluation = [evaluation[i] for i in best_index][0:self.size_pop]
+					population.append(p)
+					evaluation.append(self.f(p))
 
-			num_iters += 1
-			current_min = min(evaluation)
-			current_max = max(evaluation)
+				best_index = np.argsort(evaluation)
+				if not minimizing:
+					best_index = best_index[::-1]
+				population = [population[i] for i in best_index][0:self.size_pop]
+				evaluation = [evaluation[i] for i in best_index][0:self.size_pop]
 
-			min_found = min(min_found, current_min)
-			max_found = min(max_found, current_max)
-			min_hist.append(min_found)
-			max_hist.append(max_found)
-			avg_hist.append(np.average(evaluation))
+				num_iters += 1
+				current_min = min(evaluation)
+				current_max = max(evaluation)
+
+				min_found = min(min_found, current_min)
+				max_found = max(max_found, current_max)
+				min_hist.append(min_found)
+				max_hist.append(max_found)
+				avg_hist.append(np.average(evaluation))
+			except KeyboardInterrupt:
+				break
 
 		best_found = min_found if minimizing else max_found
 		best_solution = population[0]
 
 		return best_found, best_solution, min_hist, max_hist, avg_hist
+
+
 
 def tournament_selection(evals: list[Evaluation], r: random.Random) -> list[ParentIndexes]:
 	num_agents = len(evals)
